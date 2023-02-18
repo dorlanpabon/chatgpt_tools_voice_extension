@@ -25,6 +25,9 @@
             speechSynthesis.cancel();
         }
     });
+
+    nuevoElemento.innerHTML = `<svg fill="#ffffff" height="1.2rem" width="1.2rem"" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 300.003 300.003" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M150.001,0c-82.838,0-150,67.159-150,150c0,82.838,67.162,150.003,150,150.003c82.843,0,150-67.165,150-150.003 C300.001,67.159,232.846,0,150.001,0z M134.41,194.538c0,9.498-7.7,17.198-17.198,17.198s-17.198-7.7-17.198-17.198V105.46 c0-9.498,7.7-17.198,17.198-17.198s17.198,7.7,17.198,17.198V194.538z M198.955,194.538c0,9.498-7.701,17.198-17.198,17.198 c-9.498,0-17.198-7.7-17.198-17.198V105.46c0-9.498,7.7-17.198,17.198-17.198s17.198,7.7,17.198,17.198V194.538z"></path> </g> </g> </g></svg>  Stop Voice `;
+
     navElement.appendChild(nuevoElemento);
 
     // Agrega un evento al elemento select con Progresivo, Frase, Completo, Desactivado
@@ -113,7 +116,7 @@
     // Agrega el elemento Rate
     const rateElement = document.createElement("input");
     rateElement.id = "rate-voice";
-    rateElement.classList.add(...classList);
+    //rateElement.classList.add(...classList);
     rateElement.addEventListener("change", (event) => {
         speech_rate = event.target.value;
         localStorage.setItem("speech_rate", speech_rate);
@@ -136,17 +139,17 @@
     divRateElement.id = "div-rate-voice";
     divRateElement.classList.add(...classList);
     divRateElement.style.display = "none";
-    divRateElement.appendChild(rateElement);
     divElement.appendChild(divRateElement);
 
     // Agrega el elemento Label Rate
     const labelRateElement = document.createElement("label");
     labelRateElement.id = "label-rate-voice";
-    labelRateElement.classList.add(...classList);
+    //labelRateElement.classList.add(...classList);
     labelRateElement.textContent = "Rate: " + speech_rate;
     //for
     labelRateElement.setAttribute("for", "rate-voice");
     divRateElement.appendChild(labelRateElement);
+    divRateElement.appendChild(rateElement);
 
 
 
@@ -154,7 +157,7 @@
     // Agrega el elemento Pitch
     const pitchElement = document.createElement("input");
     pitchElement.id = "pitch-voice";
-    pitchElement.classList.add(...classList);
+    //pitchElement.classList.add(...classList);
     pitchElement.addEventListener("change", (event) => {
         speech_pitch = event.target.value;
         localStorage.setItem("speech_pitch", speech_pitch);
@@ -175,17 +178,17 @@
     divPitchElement.id = "div-pitch-voice";
     divPitchElement.classList.add(...classList);
     divPitchElement.style.display = "none";
-    divPitchElement.appendChild(pitchElement);
     divElement.appendChild(divPitchElement);
 
     // Agrega el elemento Label Pitch
     const labelPitchElement = document.createElement("label");
     labelPitchElement.id = "label-pitch-voice";
-    labelPitchElement.classList.add(...classList);
-    labelPitchElement.textContent = "Pitch" + speech_pitch;
+    //labelPitchElement.classList.add(...classList);
+    labelPitchElement.textContent = "Pitch: " + speech_pitch;
     //for
     labelPitchElement.setAttribute("for", "pitch-voice");
     divPitchElement.appendChild(labelPitchElement);
+    divPitchElement.appendChild(pitchElement);
 
 
     navElement.appendChild(divPitchElement);
@@ -199,8 +202,8 @@
         if (selectElement.style.display == "none") {
             selectElement.style.display = "block";
             selectVoicesElement.style.display = "block";
-            divPitchElement.style.display = "block";
-            divRateElement.style.display = "block";
+            divPitchElement.style.display = "flex";
+            divRateElement.style.display = "flex";
         } else {
             selectElement.style.display = "none";
             selectVoicesElement.style.display = "none";
@@ -345,7 +348,7 @@
             //si text es vacio y validate es diferente de punto y countElements 0, seguir
             //si text es diferente de vacio y validate diferente de punto, no seguir
 
-            if ((text && validateProgress && countElements != 0 && buttonRegenerateExist) || (!text && !validateProgress) || buttonStopExist) { return; }
+            if ((text) || (!text && !validateProgress) || buttonStopExist) { return; }
 
             console.log("Despues de validar textArea", speech_automatic)
             //variable buton stop, encontrado, para detener el intervalo
