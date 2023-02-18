@@ -102,6 +102,14 @@
     setTimeout(chargeVoices, 1000);
     navElement.appendChild(selectVoicesElement);
 
+    //Crear div con label y input range, label y input pitch
+    const divElement = document.createElement("div");
+    divElement.id = "div-voice";
+    divElement.classList.add(...classList);
+    divElement.style.display = "none";
+    navElement.appendChild(divElement);
+
+
     // Agrega el elemento Rate
     const rateElement = document.createElement("input");
     rateElement.id = "rate-voice";
@@ -109,6 +117,7 @@
     rateElement.addEventListener("change", (event) => {
         speech_rate = event.target.value;
         localStorage.setItem("speech_rate", speech_rate);
+        labelRateElement.innerHTML = "Rate: " + speech_rate;
     });
     rateElement.value = speech_rate;
     //type range
@@ -117,10 +126,30 @@
     rateElement.min = "0.5";
     rateElement.max = "2";
     rateElement.step = "0.1";
+    rateElement.value = speech_rate;
     //Color black, hover white
     rateElement.style.color = "black";
-    rateElement.style.display = "none";
-    navElement.appendChild(rateElement);
+
+
+    //div para label y input range
+    const divRateElement = document.createElement("div");
+    divRateElement.id = "div-rate-voice";
+    divRateElement.classList.add(...classList);
+    divRateElement.style.display = "none";
+    divRateElement.appendChild(rateElement);
+    divElement.appendChild(divRateElement);
+
+    // Agrega el elemento Label Rate
+    const labelRateElement = document.createElement("label");
+    labelRateElement.id = "label-rate-voice";
+    labelRateElement.classList.add(...classList);
+    labelRateElement.textContent = "Rate: " + speech_rate;
+    //for
+    labelRateElement.setAttribute("for", "rate-voice");
+    divRateElement.appendChild(labelRateElement);
+
+
+
 
     // Agrega el elemento Pitch
     const pitchElement = document.createElement("input");
@@ -129,6 +158,7 @@
     pitchElement.addEventListener("change", (event) => {
         speech_pitch = event.target.value;
         localStorage.setItem("speech_pitch", speech_pitch);
+        labelPitchElement.innerHTML = "Pitch: " + speech_pitch;
     });
     pitchElement.value = speech_pitch;
     //<input type="range" min="0" max="2" value="1" step="0.1" id="pitch">
@@ -136,10 +166,29 @@
     pitchElement.min = "0";
     pitchElement.max = "2";
     pitchElement.step = "0.1";
+    pitchElement.value = speech_pitch;
     //Color black, hover white
     pitchElement.style.color = "black";
-    pitchElement.style.display = "none";
-    navElement.appendChild(pitchElement);
+
+    //div para label y input pitch
+    const divPitchElement = document.createElement("div");
+    divPitchElement.id = "div-pitch-voice";
+    divPitchElement.classList.add(...classList);
+    divPitchElement.style.display = "none";
+    divPitchElement.appendChild(pitchElement);
+    divElement.appendChild(divPitchElement);
+
+    // Agrega el elemento Label Pitch
+    const labelPitchElement = document.createElement("label");
+    labelPitchElement.id = "label-pitch-voice";
+    labelPitchElement.classList.add(...classList);
+    labelPitchElement.textContent = "Pitch" + speech_pitch;
+    //for
+    labelPitchElement.setAttribute("for", "pitch-voice");
+    divPitchElement.appendChild(labelPitchElement);
+
+
+    navElement.appendChild(divPitchElement);
 
     // Agrega el elemento settings al nav
     const settingsElement = document.createElement("a");
@@ -150,13 +199,13 @@
         if (selectElement.style.display == "none") {
             selectElement.style.display = "block";
             selectVoicesElement.style.display = "block";
-            rateElement.style.display = "block";
-            pitchElement.style.display = "block";
+            divPitchElement.style.display = "block";
+            divRateElement.style.display = "block";
         } else {
             selectElement.style.display = "none";
             selectVoicesElement.style.display = "none";
-            rateElement.style.display = "none";
-            pitchElement.style.display = "none";
+            divPitchElement.style.display = "none";
+            divRateElement.style.display = "none";
 
         }
     });
@@ -164,7 +213,7 @@
     navElement.appendChild(settingsElement);
 
 
-    let elementsOptions = ["stop-voice", "select-read", "select-voice", "settings-voice", "rate-voice", "pitch-voice"];
+    let elementsOptions = ["stop-voice", "select-read", "select-voice", "div-rate-voice", "div-pitch-voice", "settings-voice"];
 
 
     function getTime() {
@@ -193,10 +242,11 @@
                 navElement.appendChild(selectVoicesElement);
             } else if (element == "settings-voice") {
                 navElement.appendChild(settingsElement);
-            } else if (element == "rate-voice") {
-                navElement.appendChild(rateElement);
-            } else if (element == "pitch-voice") {
-                navElement.appendChild(pitchElement);
+            } else if (element == "div-rate-voice") {
+                navElement.appendChild(divRateElement);
+            }
+            else if (element == "div-pitch-voice") {
+                navElement.appendChild(divPitchElement);
             }
         });
 
