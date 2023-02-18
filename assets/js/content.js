@@ -138,7 +138,7 @@
     const divRateElement = document.createElement("div");
     divRateElement.id = "div-rate-voice";
     divRateElement.classList.add(...classList);
-    divRateElement.style.display = "none";
+    divElement.style.display = "none";
     divElement.appendChild(divRateElement);
 
     // Agrega el elemento Label Rate
@@ -177,7 +177,6 @@
     const divPitchElement = document.createElement("div");
     divPitchElement.id = "div-pitch-voice";
     divPitchElement.classList.add(...classList);
-    divPitchElement.style.display = "none";
     divElement.appendChild(divPitchElement);
 
     // Agrega el elemento Label Pitch
@@ -191,7 +190,7 @@
     divPitchElement.appendChild(pitchElement);
 
 
-    navElement.appendChild(divPitchElement);
+    //navElement.appendChild(divPitchElement);
 
     // Agrega el elemento settings al nav
     const settingsElement = document.createElement("a");
@@ -202,13 +201,11 @@
         if (selectElement.style.display == "none") {
             selectElement.style.display = "block";
             selectVoicesElement.style.display = "block";
-            divPitchElement.style.display = "flex";
-            divRateElement.style.display = "flex";
+            divElement.style.display = "block";
         } else {
             selectElement.style.display = "none";
             selectVoicesElement.style.display = "none";
-            divPitchElement.style.display = "none";
-            divRateElement.style.display = "none";
+            divElement.style.display = "none";
 
         }
     });
@@ -216,7 +213,7 @@
     navElement.appendChild(settingsElement);
 
 
-    let elementsOptions = ["stop-voice", "select-read", "select-voice", "div-rate-voice", "div-pitch-voice", "settings-voice"];
+    let elementsOptions = ["stop-voice", "select-read", "select-voice", "div-voice", "settings-voice"];
 
 
     function getTime() {
@@ -245,11 +242,8 @@
                 navElement.appendChild(selectVoicesElement);
             } else if (element == "settings-voice") {
                 navElement.appendChild(settingsElement);
-            } else if (element == "div-rate-voice") {
-                navElement.appendChild(divRateElement);
-            }
-            else if (element == "div-pitch-voice") {
-                navElement.appendChild(divPitchElement);
+            } else if (element == "div-voice") {
+                navElement.appendChild(divElement);
             }
         });
 
