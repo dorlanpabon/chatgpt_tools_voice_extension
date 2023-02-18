@@ -1,19 +1,24 @@
 (() => {
 
-    speech_automatic = localStorage.getItem("speech_automatic") || "Progresivo";
+    let speech_automatic = localStorage.getItem("speech_automatic") || "Progresivo";
+    let speech_voice = localStorage.getItem("speech_voice") || "Google español de Estados Unidos";
+    let speech_lang = localStorage.getItem("speech_lang") || "es-ES";
+    let speech_rate = localStorage.getItem("speech_rate") || "1";
+    let speech_pitch = localStorage.getItem("speech_pitch") || "1";
 
+    //manejador de eventos para el evento de lectura de texto
+
+
+
+    const classList = ["flex", "py-3", "px-3", "items-center", "gap-3", "rounded-md", "hover:bg-gray-500/10", "transition-colors", "duration-200", "text-white", "cursor-pointer", "text-sm"];
     // Selecciona el elemento nav
-    const navElement = document.querySelector("nav");
-
-    // Cuenta la cantidad de hijos
-    const numHijos = navElement.children.length;
+    let navElement = document.querySelector("nav");
 
     // Crea un nuevo elemento y agregale contenido
     const nuevoElemento = document.createElement("a");
+    nuevoElemento.id = "stop-voice";
     nuevoElemento.textContent = "Stop Voice";
-    //class flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm
-    nuevoElemento.classList.add("flex", "py-3", "px-3", "items-center", "gap-3", "rounded-md", "hover:bg-gray-500/10", "transition-colors", "duration-200", "text-white", "cursor-pointer", "text-sm");
-
+    nuevoElemento.classList.add(...classList);
     // Agrega un evento al elemento nuevo
     nuevoElemento.addEventListener("click", () => {
         if ('speechSynthesis' in window) {
@@ -24,7 +29,8 @@
 
     // Agrega un evento al elemento select con Progresivo, Frase, Completo, Desactivado
     const selectElement = document.createElement("select");
-    selectElement.classList.add("flex", "py-3", "px-3", "items-center", "gap-3", "rounded-md", "hover:bg-gray-500/10", "transition-colors", "duration-200", "text-white", "cursor-pointer", "text-sm");
+    selectElement.id = "select-read";
+    selectElement.classList.add(...classList);
     selectElement.addEventListener("change", (event) => {
         speech_automatic = event.target.value;
         localStorage.setItem("speech_automatic", speech_automatic);
@@ -32,8 +38,9 @@
     selectElement.value = speech_automatic;
     //Color black, hover white
     selectElement.style.color = "black";
-
-    let options = ["Progresivo", "Frase", "Completo", "Desactivado"];
+    selectElement.style.display = "none";
+    //se quita "Completo",, ya que tiene problemas de limites de caracteres y no se puede leer
+    let options = ["Progresivo", "Frase", "Desactivado"];
     options.forEach((option) => {
         const optionElement = document.createElement("option");
         optionElement.textContent = option;
@@ -44,10 +51,120 @@
         }
         selectElement.appendChild(optionElement);
     });
-
     navElement.appendChild(selectElement);
 
+    // Agrega el elemento Select voices
+    const selectVoicesElement = document.createElement("select");
+    selectVoicesElement.id = "select-voice";
+    selectVoicesElement.classList.add(...classList);
+    selectVoicesElement.addEventListener("change", (event) => {
+        speech_voice = event.target.value;
+        localStorage.setItem("speech_voice", speech_voice);
 
+        speech_lang = event.target.options[event.target.selectedIndex].getAttribute("data-voice-lang");
+        localStorage.setItem("speech_lang", speech_lang);
+    });
+    selectVoicesElement.value = speech_voice;
+    //Color black, hover white
+    selectVoicesElement.style.color = "black";
+    selectVoicesElement.style.display = "none";
+    speechSynthesis.getVoices();
+    chargeVoices = () => {
+        voices = speechSynthesis.getVoices().sort(function (a, b) {
+            const aname = a.name.toUpperCase();
+            const bname = b.name.toUpperCase();
+
+            if (aname < bname) {
+                return -1;
+            } else if (aname == bname) {
+                return 0;
+            } else {
+                return +1;
+            }
+        });
+        //alert("Cargando voces, por favor espere..." + voices.length);
+        voices.forEach((voice) => {
+            //dalidate is localService true
+            //if (!voice.localService) { return; }
+            console.log(voice.name);
+            const optionElement = document.createElement("option");
+            optionElement.textContent = voice.name;
+            optionElement.value = voice.name;
+            //data-voice-lang
+            optionElement.setAttribute("data-voice-lang", voice.lang);
+            //SELECTED
+            if (voice.name == speech_voice) {
+                optionElement.selected = true;
+            }
+            selectVoicesElement.appendChild(optionElement);
+        });
+    }
+    setTimeout(chargeVoices, 1000);
+    navElement.appendChild(selectVoicesElement);
+
+    // Agrega el elemento Rate
+    const rateElement = document.createElement("input");
+    rateElement.id = "rate-voice";
+    rateElement.classList.add(...classList);
+    rateElement.addEventListener("change", (event) => {
+        speech_rate = event.target.value;
+        localStorage.setItem("speech_rate", speech_rate);
+    });
+    rateElement.value = speech_rate;
+    //type range
+    rateElement.type = "range";
+    //<input type="range" min="0.5" max="2" value="1" step="0.1" id="rate">
+    rateElement.min = "0.5";
+    rateElement.max = "2";
+    rateElement.step = "0.1";
+    //Color black, hover white
+    rateElement.style.color = "black";
+    rateElement.style.display = "none";
+    navElement.appendChild(rateElement);
+
+    // Agrega el elemento Pitch
+    const pitchElement = document.createElement("input");
+    pitchElement.id = "pitch-voice";
+    pitchElement.classList.add(...classList);
+    pitchElement.addEventListener("change", (event) => {
+        speech_pitch = event.target.value;
+        localStorage.setItem("speech_pitch", speech_pitch);
+    });
+    pitchElement.value = speech_pitch;
+    //<input type="range" min="0" max="2" value="1" step="0.1" id="pitch">
+    pitchElement.type = "range";
+    pitchElement.min = "0";
+    pitchElement.max = "2";
+    pitchElement.step = "0.1";
+    //Color black, hover white
+    pitchElement.style.color = "black";
+    pitchElement.style.display = "none";
+    navElement.appendChild(pitchElement);
+
+    // Agrega el elemento settings al nav
+    const settingsElement = document.createElement("a");
+    settingsElement.id = "settings-voice";
+    settingsElement.textContent = "Settings";
+    settingsElement.classList.add(...classList);
+    settingsElement.addEventListener("click", () => {
+        if (selectElement.style.display == "none") {
+            selectElement.style.display = "block";
+            selectVoicesElement.style.display = "block";
+            rateElement.style.display = "block";
+            pitchElement.style.display = "block";
+        } else {
+            selectElement.style.display = "none";
+            selectVoicesElement.style.display = "none";
+            rateElement.style.display = "none";
+            pitchElement.style.display = "none";
+
+        }
+    });
+
+    navElement.appendChild(settingsElement);
+
+
+    let elementsOptions = ["stop-voice", "select-read", "select-voice", "settings-voice", "rate-voice", "pitch-voice"];
 
 
     function getTime() {
@@ -60,6 +177,31 @@
     }
 
     setInterval(function () {
+
+        //validar si los elementos ya estan creados si no crearlos
+        elementsOptions.forEach((element) => {
+            //console.log(element);
+            let elementExists = document.getElementById(element);
+            //console.log(elementExists);
+            if (elementExists != null) { return; }
+            navElement = document.querySelector("nav");
+            if (element == "stop-voice") {
+                navElement.appendChild(nuevoElemento);
+            } else if (element == "select-read") {
+                navElement.appendChild(selectElement);
+            } else if (element == "select-voice") {
+                navElement.appendChild(selectVoicesElement);
+            } else if (element == "settings-voice") {
+                navElement.appendChild(settingsElement);
+            } else if (element == "rate-voice") {
+                navElement.appendChild(rateElement);
+            } else if (element == "pitch-voice") {
+                navElement.appendChild(pitchElement);
+            }
+        });
+
+
+
         //add button to voice, copy and share
         var elements = document.querySelectorAll(
             ".flex-col.relative.items-end:not(.button-added)"
@@ -75,7 +217,29 @@
             button1.onclick = function () {
                 //print text
                 console.log("speech:", element.parentElement.innerText);
-                leerTexto(element.parentElement.innerText);
+                let textHtml = element.parentElement?.innerHTML.replace(/<pre>[\s\S]*?<\/pre>/g, "");
+                let temporal = document.createElement("div");
+                temporal.innerHTML = textHtml;
+                let textLast = temporal.textContent || temporal.innerText || "";
+
+                let textCountSpeak = 0;
+                separador = /([.,])/;
+                textSplit = textLast?.match(/.+?[.,]|.+/g);
+                textSplitLength = textSplit.length;
+                condicion = textCountSpeak < textSplitLength;
+
+                if (condicion) {
+                    //Obtener el texto de las 10 palabras
+                    let textSend = "";
+                    for (let i = textCountSpeak; i < textSplitLength; i++) {
+                        //textSend += textSplit[i] + separador;
+                        textCountSpeak++;
+                        leerTexto(textSplit[i]);
+                    }
+                    //if (speech_automatic == 'Frase') { textCountSpeak--; }
+                    //Enviar el texto
+                }
+
 
             };
             button2.innerHTML = `<svg fill="#acacbe" height="1.5em" width="1.5em"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve" stroke="#acacbe" transform="matrix(-1, 0, 0, 1, 0, 0)rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Text-files"> <path d="M53.9791489,9.1429005H50.010849c-0.0826988,0-0.1562004,0.0283995-0.2331009,0.0469999V5.0228 C49.7777481,2.253,47.4731483,0,44.6398468,0h-34.422596C7.3839517,0,5.0793519,2.253,5.0793519,5.0228v46.8432999 c0,2.7697983,2.3045998,5.0228004,5.1378999,5.0228004h6.0367002v2.2678986C16.253952,61.8274002,18.4702511,64,21.1954517,64 h32.783699c2.7252007,0,4.9414978-2.1725998,4.9414978-4.8432007V13.9861002 C58.9206467,11.3155003,56.7043495,9.1429005,53.9791489,9.1429005z M7.1110516,51.8661003V5.0228 c0-1.6487999,1.3938999-2.9909999,3.1062002-2.9909999h34.422596c1.7123032,0,3.1062012,1.3422,3.1062012,2.9909999v46.8432999 c0,1.6487999-1.393898,2.9911003-3.1062012,2.9911003h-34.422596C8.5049515,54.8572006,7.1110516,53.5149002,7.1110516,51.8661003z M56.8888474,59.1567993c0,1.550602-1.3055,2.8115005-2.9096985,2.8115005h-32.783699 c-1.6042004,0-2.9097996-1.2608986-2.9097996-2.8115005v-2.2678986h26.3541946 c2.8333015,0,5.1379013-2.2530022,5.1379013-5.0228004V11.1275997c0.0769005,0.0186005,0.1504021,0.0469999,0.2331009,0.0469999 h3.9682999c1.6041985,0,2.9096985,1.2609005,2.9096985,2.8115005V59.1567993z"></path> <path d="M38.6031494,13.2063999H16.253952c-0.5615005,0-1.0159006,0.4542999-1.0159006,1.0158005 c0,0.5615997,0.4544001,1.0158997,1.0159006,1.0158997h22.3491974c0.5615005,0,1.0158997-0.4542999,1.0158997-1.0158997 C39.6190491,13.6606998,39.16465,13.2063999,38.6031494,13.2063999z"></path> <path d="M38.6031494,21.3334007H16.253952c-0.5615005,0-1.0159006,0.4542999-1.0159006,1.0157986 c0,0.5615005,0.4544001,1.0159016,1.0159006,1.0159016h22.3491974c0.5615005,0,1.0158997-0.454401,1.0158997-1.0159016 C39.6190491,21.7877007,39.16465,21.3334007,38.6031494,21.3334007z"></path> <path d="M38.6031494,29.4603004H16.253952c-0.5615005,0-1.0159006,0.4543991-1.0159006,1.0158997 s0.4544001,1.0158997,1.0159006,1.0158997h22.3491974c0.5615005,0,1.0158997-0.4543991,1.0158997-1.0158997 S39.16465,29.4603004,38.6031494,29.4603004z"></path> <path d="M28.4444485,37.5872993H16.253952c-0.5615005,0-1.0159006,0.4543991-1.0159006,1.0158997 s0.4544001,1.0158997,1.0159006,1.0158997h12.1904964c0.5615025,0,1.0158005-0.4543991,1.0158005-1.0158997 S29.0059509,37.5872993,28.4444485,37.5872993z"></path> </g> </g></svg>`;
@@ -124,12 +288,14 @@
             console.log("validateProgress", validateProgress)
             let countElements = document.querySelectorAll(".flex-col.relative.items-end.button-added")?.length;
             console.log("countElements", countElements)
-            let buttonStopExist = document.querySelector("form button:not(.button-send).justify-center")?.innerText.includes("Stop");
+            let buttonStopExist = document.querySelector("form button:not(.button-send).justify-center")?.innerText.includes("Stop") || false;
             console.log("buttonStopExist", buttonStopExist)
+            let buttonRegenerateExist = document.querySelector("form button:not(.button-send).justify-center")?.innerText.includes("Regenerate") || false;
+            console.log("buttonRegenerateExist", buttonRegenerateExist)
             //si text es vacio y validate es diferente de punto y countElements 0, seguir
             //si text es diferente de vacio y validate diferente de punto, no seguir
 
-            if ((text && validateProgress && countElements != 0) || (!text && !validateProgress) || buttonStopExist) { return; }
+            if ((text && validateProgress && countElements != 0 && buttonRegenerateExist) || (!text && !validateProgress) || buttonStopExist) { return; }
 
             console.log("Despues de validar textArea", speech_automatic)
             //variable buton stop, encontrado, para detener el intervalo
@@ -179,8 +345,8 @@
                         break;
                     case 'Frase':
                         //Validar si se pueden enviar 10 palabras, asi suscesivamente
-                        separador = ".";
-                        textSplit = textLast?.split(separador);
+                        separador = /([.,])/;
+                        textSplit = textLast?.match(/.+?[.,]|.+/g);
                         textSplitLength = textSplit.length - 1;
                         condicion = textCountSpeak < textSplitLength;
                         break;
@@ -198,7 +364,7 @@
                         //Obtener el texto de las 10 palabras
                         let textSend = "";
                         for (let i = textCountSpeak; i < textSplitLength; i++) {
-                            textSend += textSplit[i] + separador;
+                            textSend += textSplit[i];
                             textCountSpeak++;
                         }
                         //if (speech_automatic == 'Frase') { textCountSpeak--; }
@@ -221,7 +387,7 @@
                     //Obtener el texto de las 10 palabras
                     let textSend = "";
                     for (let i = textCountSpeak; i < textSplit.length; i++) {
-                        textSend += textSplit[i] + separador;
+                        textSend += textSplit[i];
                         textCountSpeak++;
                     }
                     //Enviar el texto
@@ -253,6 +419,50 @@
     function leerTexto(texto) {
         if ('speechSynthesis' in window) {
             const mensaje = new SpeechSynthesisUtterance(texto);
+            for (let i = 0; i < voices.length; i++) {
+                if (voices[i].name == speech_voice) {
+                    mensaje.voice = voices[i];
+                    mensaje.lang = voices[i].lang;
+                    break;
+                }
+            }
+            mensaje.rate = speech_rate;
+            mensaje.pitch = speech_pitch;
+
+            mensaje.onend = (event) => {
+                console.log("onend");
+                console.log(event);
+            }
+
+            mensaje.onmark = (event) => {
+                console.log("onmark");
+                console.log(event);
+            }
+
+            mensaje.onpause = (event) => {
+                console.log("onpause");
+                console.log(event);
+            }
+
+            mensaje.onerror = (event) => {
+                console.log("onerror");
+                console.log(event);
+            }
+
+            mensaje.onresume = (event) => {
+                console.log("onresume");
+                console.log(event);
+            }
+
+            mensaje.onstart = (event) => {
+                console.log("onstart");
+                console.log(event);
+            }
+            mensaje.onboundary = (event) => {
+                console.log("onboundary");
+                console.log(event.name);
+            }
+            console.log("mensaje", mensaje)
             speechSynthesis.speak(mensaje);
         } else {
             console.log("Lo siento, tu navegador no admite la API de Web Speech");
