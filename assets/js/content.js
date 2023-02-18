@@ -6,9 +6,9 @@
     let speech_rate = localStorage.getItem("speech_rate") || "1";
     let speech_pitch = localStorage.getItem("speech_pitch") || "1";
 
-    //manejador de eventos para el evento de lectura de texto
-
-
+    let SpeechRecognition = webkitSpeechRecognition;
+    let SpeechGrammarList = webkitSpeechGrammarList;
+    let SpeechRecognitionEvent = webkitSpeechRecognitionEvent;
 
     const classList = ["flex", "py-3", "px-3", "items-center", "gap-3", "rounded-md", "hover:bg-gray-500/10", "transition-colors", "duration-200", "text-white", "cursor-pointer", "text-sm"];
     // Selecciona el elemento nav
@@ -25,10 +25,9 @@
             speechSynthesis.cancel();
         }
     });
-
     nuevoElemento.innerHTML = `<svg fill="#ffffff" height="1.2rem" width="1.2rem"" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 300.003 300.003" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M150.001,0c-82.838,0-150,67.159-150,150c0,82.838,67.162,150.003,150,150.003c82.843,0,150-67.165,150-150.003 C300.001,67.159,232.846,0,150.001,0z M134.41,194.538c0,9.498-7.7,17.198-17.198,17.198s-17.198-7.7-17.198-17.198V105.46 c0-9.498,7.7-17.198,17.198-17.198s17.198,7.7,17.198,17.198V194.538z M198.955,194.538c0,9.498-7.701,17.198-17.198,17.198 c-9.498,0-17.198-7.7-17.198-17.198V105.46c0-9.498,7.7-17.198,17.198-17.198s17.198,7.7,17.198,17.198V194.538z"></path> </g> </g> </g></svg>  Stop Voice `;
-
     navElement.appendChild(nuevoElemento);
+
 
     // Agrega un evento al elemento select con Progresivo, Frase, Completo, Desactivado
     const selectElement = document.createElement("select");
@@ -63,7 +62,6 @@
     selectVoicesElement.addEventListener("change", (event) => {
         speech_voice = event.target.value;
         localStorage.setItem("speech_voice", speech_voice);
-
         speech_lang = event.target.options[event.target.selectedIndex].getAttribute("data-voice-lang");
         localStorage.setItem("speech_lang", speech_lang);
     });
@@ -76,7 +74,6 @@
         voices = speechSynthesis.getVoices().sort(function (a, b) {
             const aname = a.name.toUpperCase();
             const bname = b.name.toUpperCase();
-
             if (aname < bname) {
                 return -1;
             } else if (aname == bname) {
@@ -104,13 +101,13 @@
     }
     setTimeout(chargeVoices, 1000);
     navElement.appendChild(selectVoicesElement);
-
     //Crear div con label y input range, label y input pitch
     const divElement = document.createElement("div");
     divElement.id = "div-voice";
     divElement.classList.add(...classList);
     divElement.style.display = "none";
     navElement.appendChild(divElement);
+
 
 
     // Agrega el elemento Rate
@@ -133,7 +130,6 @@
     //Color black, hover white
     rateElement.style.color = "black";
 
-
     //div para label y input range
     const divRateElement = document.createElement("div");
     divRateElement.id = "div-rate-voice";
@@ -150,6 +146,7 @@
     labelRateElement.setAttribute("for", "rate-voice");
     divRateElement.appendChild(labelRateElement);
     divRateElement.appendChild(rateElement);
+
 
 
 
@@ -190,7 +187,6 @@
     divPitchElement.appendChild(pitchElement);
 
 
-    //navElement.appendChild(divPitchElement);
 
     // Agrega el elemento settings al nav
     const settingsElement = document.createElement("a");
@@ -209,11 +205,52 @@
 
         }
     });
-
     navElement.appendChild(settingsElement);
 
+    //<button class="button-send"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
 
-    let elementsOptions = ["stop-voice", "select-read", "select-voice", "div-voice", "settings-voice"];
+
+    var recognition = new SpeechRecognition();
+    recognition.onresult = function (event) {
+
+        let textareaEnter = document.querySelector("form div div textarea");
+        var speechResult = event.results[0][0].transcript.toLowerCase();
+        console.log('Speech received: ' + speechResult + '.');
+        textareaEnter.value = textareaEnter.value + " " + speechResult;
+    }
+    recognition.onspeechend = function () {
+        recognition.stop();
+        recordElement?.classList.remove("button-stop");
+        recordElement?.classList.add("button-record");
+        console.log('Speech has stopped being detected.');
+    }
+    // Agregar elemento record al form
+    const formElement = document.querySelector("form");
+    const recordElement = document.createElement("div");
+    recordElement.id = "record-voice";
+    recordElement.classList.add(...classList.concat("button-send").concat("button-record"));
+    recordElement.addEventListener("click", () => {
+        if (recordElement.classList.contains("button-record")) {
+            recordElement.classList.remove("button-record");
+            recordElement.classList.add("button-stop");
+            recognition.start();
+        } else {
+            recordElement.classList.remove("button-stop");
+            recordElement.classList.add("button-record");
+            recognition.stop();
+        }
+    });
+    //icon record
+    recordElement.innerHTML = `<svg fill="#918d8d" width="2em" height="2em" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="#918d8d"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M25 0C18.921875 0 14 4.785156 14 10.71875L14 11L21.5 11C22.050781 11 22.5 11.449219 22.5 12C22.5 12.550781 22.050781 13 21.5 13L14 13L14 15L21.5 15C22.050781 15 22.5 15.449219 22.5 16C22.5 16.550781 22.050781 17 21.5 17L14 17L14 19L21.5 19C22.050781 19 22.5 19.449219 22.5 20C22.5 20.550781 22.050781 21 21.5 21L14 21L14 23.28125C14 29.214844 18.921875 34 25 34C31.078125 34 36 29.214844 36 23.28125L36 21L28.5 21C27.945313 21 27.5 20.550781 27.5 20C27.5 19.449219 27.945313 19 28.5 19L36 19L36 17L28.5 17C27.945313 17 27.5 16.550781 27.5 16C27.5 15.449219 27.945313 15 28.5 15L36 15L36 13L28.5 13C27.945313 13 27.5 12.550781 27.5 12C27.5 11.449219 27.945313 11 28.5 11L36 11L36 10.71875C36 4.785156 31.078125 0 25 0 Z M 9.8125 17.125C9.402344 17.210938 9.113281 17.582031 9.125 18L9.125 23C9.125 30.714844 14.6875 37.183594 22 38.59375L22 44L28 44L28 38.59375C35.3125 37.183594 40.875 30.714844 40.875 23L40.875 18C40.875 17.515625 40.484375 17.125 40 17.125C39.515625 17.125 39.125 17.515625 39.125 18L39.125 23C39.125 30.800781 32.800781 37.125 25 37.125C17.199219 37.125 10.875 30.800781 10.875 23L10.875 18C10.878906 17.75 10.773438 17.511719 10.589844 17.34375C10.402344 17.175781 10.15625 17.09375 9.90625 17.125C9.875 17.125 9.84375 17.125 9.8125 17.125 Z M 15.5 46C13.585938 46 12.03125 47.5625 12.03125 49.46875L12 50L37.875 49.9375L37.90625 49.46875C37.90625 47.5625 36.351563 46 34.4375 46Z"></path></g></svg>`;
+
+
+    formElement.appendChild(recordElement);
+
+
+
+
+
+    let elementsOptions = ["stop-voice", "select-read", "select-voice", "div-voice", "record-voice", "settings-voice"];
 
 
     function getTime() {
@@ -244,6 +281,9 @@
                 navElement.appendChild(settingsElement);
             } else if (element == "div-voice") {
                 navElement.appendChild(divElement);
+            } else if (element == "record-voice") {
+                const formElement = document.querySelector("form");
+                formElement.appendChild(recordElement);
             }
         });
 
