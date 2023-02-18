@@ -217,6 +217,8 @@
         var speechResult = event.results[0][0].transcript.toLowerCase();
         console.log('Speech received: ' + speechResult + '.');
         textareaEnter.value = textareaEnter.value + " " + speechResult;
+
+        recognition.stop();
     }
     recognition.onspeechend = function () {
         recognition.stop();
@@ -231,9 +233,20 @@
     recordElement.classList.add(...classList.concat("button-send").concat("button-record"));
     recordElement.addEventListener("click", () => {
         if (recordElement.classList.contains("button-record")) {
-            recordElement.classList.remove("button-record");
-            recordElement.classList.add("button-stop");
-            recognition.start();
+
+            //Solicitar permiso para usar el micrófono
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function (stream) {
+                    recordElement.classList.remove("button-record");
+                    recordElement.classList.add("button-stop");
+                    recognition.start();
+                    console.log('You let me use your mic!');
+                })
+                .catch(function (err) {
+                    console.log('You must allow the use of the microphone.');
+                    alert("You must allow the use of the microphone to use this feature.");
+                });
+
         } else {
             recordElement.classList.remove("button-stop");
             recordElement.classList.add("button-record");
