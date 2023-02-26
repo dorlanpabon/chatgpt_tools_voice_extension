@@ -458,6 +458,7 @@
             if (speech_automatic == i18n[lang]["Desactivado"]) {
                 buttonWithTextSend?.removeEventListener("click", handleClick); return;
             }
+
             console.log("Antes de validar textArea", speech_automatic)
             let text = document.querySelector("form textarea").value == "";
             console.log("text", text)
@@ -472,7 +473,20 @@
             //si text es vacio y validate es diferente de punto y countElements 0, seguir
             //si text es diferente de vacio y validate diferente de punto, no seguir
 
-            if ((text) || (!text && !validateProgress) || buttonStopExist) { return; }
+            //if ((text) || (!text && !validateProgress) || buttonStopExist) { return; }
+            if (text) { return; }
+
+
+            // Mostrar toast procesando para leer
+            document.body.appendChild(toast);
+            toast.textContent = i18n[lang]["ProcesandoParaLeer"];
+            // Mostrar el "toast" durante 3 segundos y luego eliminarlo
+            toast.style.display = "block";
+            console.log(toast);
+            setTimeout(() => {
+                // Eliminar el "toast" después de 3 segundos
+                toast.remove();
+            }, 3000);
 
             console.log("Despues de validar textArea", speech_automatic)
             //variable buton stop, encontrado, para detener el intervalo
