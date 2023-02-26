@@ -34,7 +34,7 @@
     // Validar si existe chatgpt_tool_voice en el localStorage, si no existe mostrar el mensaje de bienvenida diciendo que solo leera automaticamente cuando se da click en el boton de enviar.
     let bienvenida = localStorage.getItem("chatgpt_tool_voice_bienvenida") || false;
     if (!bienvenida) {
-        //localStorage.setItem("chatgpt_tool_voice_bienvenida", true);
+        localStorage.setItem("chatgpt_tool_voice_bienvenida", true);
         alert(i18n[lang]["Bienvenida"]);
     }
 

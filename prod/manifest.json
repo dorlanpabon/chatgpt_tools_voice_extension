@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ChatGPT Tool Voice",
   "description": "Desarrollado por Juan Camilo Pabon",
-  "version": "1.0",
+  "version": "1.1",
   "icons": {
     "128": "./assets/images/icon.png",
     "16": "./assets/images/icon.png"
