@@ -1,7 +1,9 @@
 (() => {
 
     //Identificar el idioma del navegador
-    let lang = navigator.language || navigator.userLanguage || "en";
+    let lang = navigator.language || navigator.userLanguage;
+    // Si lang no es es o en, entonces es en
+    if (lang != "es" && lang != "en") { lang = "en"; }
 
     //internacionalizacion del archivo content.js
     let i18n = {
